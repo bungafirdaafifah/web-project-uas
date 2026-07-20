@@ -19,6 +19,8 @@ class Config:
     def init_app(app):
         profile_upload_dir = os.path.join(Config.UPLOAD_FOLDER, 'profile')
         logo_upload_dir = os.path.join(Config.UPLOAD_FOLDER)
-        
-        os.makedirs(profile_upload_dir, exist_ok=True)
-        os.makedirs(logo_upload_dir, exist_ok=True)
+
+        # Jangan membuat folder saat berjalan di Vercel
+        if not os.environ.get("VERCEL"):
+            os.makedirs(profile_upload_dir, exist_ok=True)
+            os.makedirs(logo_upload_dir, exist_ok=True)
