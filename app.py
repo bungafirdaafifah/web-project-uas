@@ -118,7 +118,10 @@ def _seed_konten_situs():
         db.session.commit()
         print('[Seed] Konten FAQ default dibuat.')
 
+app = create_app()
 
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)
+
+S
