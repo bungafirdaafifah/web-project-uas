@@ -1,0 +1,82 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Ubah Data Mahasiswa — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header -->
+  <div class="mb-4">
+    <a href="{{ url_for('mahasiswa.index') }}" class="text-muted" style="font-size: 0.85rem;"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Mahasiswa</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Ubah Data <span class="gradient-text">Mahasiswa</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Ubah data untuk mahasiswa: {{ mahasiswa.nama }}.</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="glass-card p-4 p-md-5">
+    <form action="{{ url_for('mahasiswa.edit', id=mahasiswa.id) }}" method="POST" class="needs-validation" novalidate>
+      <div class="row g-4">
+        
+        <!-- NIM -->
+        <div class="col-md-6">
+          <label for="nim" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Nomor Induk Mahasiswa (NIM)</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="nim" name="nim" 
+                 value="{{ mahasiswa.nim }}" required>
+          <div class="invalid-feedback">NIM wajib diisi.</div>
+        </div>
+
+        <!-- Nama Lengkap -->
+        <div class="col-md-6">
+          <label for="nama" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Nama Lengkap</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="nama" name="nama" 
+                 value="{{ mahasiswa.nama }}" required>
+          <div class="invalid-feedback">Nama lengkap wajib diisi.</div>
+        </div>
+
+        <!-- Kelas -->
+        <div class="col-md-6">
+          <label for="kelas" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Kelas</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="kelas" name="kelas" 
+                 value="{{ mahasiswa.kelas }}" required>
+          <div class="invalid-feedback">Kelas wajib diisi.</div>
+        </div>
+
+        <!-- Status Mahasiswa -->
+        <div class="col-md-6">
+          <label for="status_mahasiswa" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Status Mahasiswa</label>
+          <select name="status_mahasiswa" id="status_mahasiswa" class="form-select border-glass text-white bg-dark" required style="font-size: 0.9rem;">
+            <option value="Aktif" {% if mahasiswa.status_mahasiswa == 'Aktif' %}selected{% endif %}>Aktif</option>
+            <option value="Nonaktif" {% if mahasiswa.status_mahasiswa == 'Nonaktif' %}selected{% endif %}>Nonaktif</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700">
+            <i class="bi bi-save"></i> Perbarui Data
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Form validation script -->
+<script>
+  (() => {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
+{% endblock %}

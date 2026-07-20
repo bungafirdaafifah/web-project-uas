@@ -1,0 +1,240 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Dashboard Utama — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Top header & filter -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+      <h2 class="fw-800 text-white mb-0">Dashboard <span class="gradient-text">Ringkasan</span></h2>
+      <p class="text-muted mb-0" style="font-size: 0.9rem;">
+        {% if selected_semester %}
+          Menampilkan data kas untuk semester <strong>{{ selected_semester.nama_semester }}</strong>.
+        {% else %}
+          Menampilkan akumulasi seluruh data kas dari semua semester.
+        {% endif %}
+      </p>
+    </div>
+    
+    <!-- Filter Semester Dropdown -->
+    <div>
+      <form method="GET" action="{{ url_for('dashboard.index') }}" class="d-flex align-items-center gap-2">
+        <label for="semester_id" class="text-muted fw-600 mb-0 d-none d-sm-block" style="font-size: 0.85rem; white-space: nowrap;">Pilih Semester:</label>
+        <select name="semester_id" id="semester_id" class="form-select border-glass text-white bg-dark" onchange="this.form.submit()" style="font-size: 0.9rem; min-width: 200px;">
+          <option value="">Semua Semester</option>
+          {% for sem in semesters %}
+            <option value="{{ sem.id }}" {% if selected_semester and selected_semester.id == sem.id %}selected{% endif %}>{{ sem.nama_semester }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6 Stat Cards Grid -->
+  <div class="row g-3 mb-5">
+    <!-- 1. Jumlah Mahasiswa -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-indigo">👥</div>
+        <div class="stat-value text-white">{{ total_mahasiswa }}</div>
+        <div class="stat-label">Jumlah Mahasiswa</div>
+      </div>
+    </div>
+
+    <!-- 2. Total Pendapatan -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-emerald">💰</div>
+        <div class="stat-value text-emerald">Rp {{ "{:,.0f}".format(total_pendapatan).replace(",", ".") }}</div>
+        <div class="stat-label">Total Pendapatan Kas</div>
+      </div>
+    </div>
+
+    <!-- 3. Total Pengeluaran -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-rose">💸</div>
+        <div class="stat-value text-rose">Rp {{ "{:,.0f}".format(total_pengeluaran).replace(",", ".") }}</div>
+        <div class="stat-label">Total Pengeluaran Kas</div>
+      </div>
+    </div>
+
+    <!-- 4. Saldo Kas Bersih -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-amber">📊</div>
+        <div class="stat-value text-amber">Rp {{ "{:,.0f}".format(saldo_kas).replace(",", ".") }}</div>
+        <div class="stat-label">Saldo Kas Bersih</div>
+      </div>
+    </div>
+
+    <!-- 5. Mahasiswa Lunas -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-emerald">✅</div>
+        <div class="stat-value text-emerald">{{ mahasiswa_lunas }}</div>
+        <div class="stat-label">Mahasiswa Lunas</div>
+      </div>
+    </div>
+
+    <!-- 6. Mahasiswa Belum Lunas -->
+    <div class="col-md-4 col-sm-6">
+      <div class="stat-card">
+        <div class="stat-icon text-rose">⚠️</div>
+        <div class="stat-value text-rose">{{ mahasiswa_belum_lunas }}</div>
+        <div class="stat-label">Mahasiswa Belum Lunas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Akses Cepat -->
+  <div class="mb-5">
+    <h5 class="fw-700 text-white mb-3">Akses Cepat</h5>
+    <div class="row g-3">
+      <div class="col-md-3 col-sm-6">
+        <a href="{{ url_for('kelola_data.index') }}" class="quick-access-card">
+          <div class="quick-access-icon bg-indigo">📂</div>
+          <div class="quick-access-label">Kelola Data</div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <a href="{{ url_for('website.index') }}" class="quick-access-card">
+          <div class="quick-access-icon bg-violet">🌐</div>
+          <div class="quick-access-label">Kelola Website</div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <a href="{{ url_for('pesan.index') }}" class="quick-access-card">
+          <div class="quick-access-icon bg-amber">📩</div>
+          <div class="quick-access-label">Pesan</div>
+        </a>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <a href="{{ url_for('pengaturan.index') }}" class="quick-access-card">
+          <div class="quick-access-icon bg-emerald">⚙️</div>
+          <div class="quick-access-label">Pengaturan</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row g-4 mb-4">
+    <!-- Chart 1: Pendapatan & Pengeluaran -->
+    <div class="col-lg-8">
+      <div class="glass-card p-4">
+        <h5 class="fw-700 text-white mb-4"><i class="bi bi-graph-up text-primary me-2"></i> Perbandingan Kas per Semester</h5>
+        <div style="position: relative; height: 320px;">
+          <canvas id="cashFlowChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Status Pembayaran -->
+    <div class="col-lg-4">
+      <div class="glass-card p-4">
+        <h5 class="fw-700 text-white mb-4"><i class="bi bi-pie-chart text-success me-2"></i> Status Kelunasan</h5>
+        <div style="position: relative; height: 320px;" class="d-flex align-items-center justify-content-center">
+          <canvas id="paymentStatusChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Colors
+    const primaryColor = '#2563EB';
+    const secondaryColor = '#10b981';
+    const dangerColor = '#ef4444';
+    const textMuted = '#CFE8FF';
+    const borderGlass = 'rgba(59, 130, 246, 0.18)';
+
+    // Chart 1: Cash Flow comparison
+    const ctxFlow = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(ctxFlow, {
+      type: 'bar',
+      data: {
+        labels: {{ semester_labels | tojson }},
+        datasets: [
+          {
+            label: 'Pendapatan',
+            data: {{ income_data | tojson }},
+            backgroundColor: 'rgba(16, 185, 129, 0.65)',
+            borderColor: secondaryColor,
+            borderWidth: 1.5,
+            borderRadius: 6
+          },
+          {
+            label: 'Pengeluaran',
+            data: {{ expense_data | tojson }},
+            backgroundColor: 'rgba(239, 68, 68, 0.65)',
+            borderColor: dangerColor,
+            borderWidth: 1.5,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#FFFFFF', font: { family: 'Plus Jakarta Sans', weight: '600' } }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: borderGlass },
+            ticks: { color: textMuted, font: { family: 'Plus Jakarta Sans' } }
+          },
+          y: {
+            grid: { color: borderGlass },
+            ticks: { color: textMuted, font: { family: 'Plus Jakarta Sans' } }
+          }
+        }
+      }
+    });
+
+    // Chart 2: Payment Status
+    const ctxStatus = document.getElementById('paymentStatusChart').getContext('2d');
+    new Chart(ctxStatus, {
+      type: 'doughnut',
+      data: {
+        labels: ['Lunas', 'Belum Lunas'],
+        datasets: [{
+          data: [{{ mahasiswa_lunas }}, {{ mahasiswa_belum_lunas }}],
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.75)',
+            'rgba(239, 68, 68, 0.75)'
+          ],
+          borderColor: [
+            secondaryColor,
+            dangerColor
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#FFFFFF', font: { family: 'Plus Jakarta Sans', weight: '600' } }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+  });
+</script>
+{% endblock %}

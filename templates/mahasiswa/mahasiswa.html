@@ -1,0 +1,84 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Manajemen Mahasiswa — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header & Search -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+      <h2 class="fw-800 text-white mb-0">Manajemen <span class="gradient-text">Mahasiswa</span></h2>
+      <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola data mahasiswa kelas, status keaktifan, dan progres pembayaran kas mereka.</p>
+    </div>
+    
+    <div class="d-flex align-items-center gap-2 w-100 w-md-auto">
+      <!-- Search Form -->
+      <form method="GET" action="{{ url_for('mahasiswa.index') }}" class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
+        <input type="text" name="q" class="form-control border-glass text-white bg-dark" placeholder="Cari NIM atau Nama..." value="{{ query or '' }}" style="font-size: 0.9rem; min-width: 200px;">
+        <button type="submit" class="btn btn-outline-light btn-sm px-3 py-2"><i class="bi bi-search"></i></button>
+        {% if query %}
+          <a href="{{ url_for('mahasiswa.index') }}" class="btn btn-outline-danger btn-sm px-3 py-2" title="Reset"><i class="bi bi-x-lg"></i></a>
+        {% endif %}
+      </form>
+      
+      <a href="{{ url_for('mahasiswa.tambah') }}" class="btn-primary-custom" style="white-space: nowrap;">
+        <i class="bi bi-person-plus"></i> Tambah Mahasiswa
+      </a>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-custom align-middle">
+      <thead>
+        <tr>
+          <th>NIM</th>
+          <th>Nama Lengkap</th>
+          <th>Kelas</th>
+          <th>Status</th>
+          <th class="text-center" style="width: 220px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if students %}
+          {% for mhs in students %}
+            <tr>
+              <td class="fw-700 text-white">{{ mhs.nim }}</td>
+              <td class="fw-600 text-light">{{ mhs.nama }}</td>
+              <td>{{ mhs.kelas }}</td>
+              <td>
+                {% if mhs.status_mahasiswa == 'Aktif' %}
+                  <span class="badge bg-emerald text-emerald" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Aktif</span>
+                {% else %}
+                  <span class="badge bg-rose text-rose" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Nonaktif</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{{ url_for('pembayaran.detail', id=mhs.id) }}" class="btn btn-sm btn-primary-custom py-1 px-3" style="font-size: 0.75rem; box-shadow: none;">
+                    <i class="bi bi-cash-stack"></i> Pembayaran
+                  </a>
+                  <a href="{{ url_for('mahasiswa.edit', id=mhs.id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form action="{{ url_for('mahasiswa.hapus', id=mhs.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus mahasiswa {{ mhs.nama }}? Seluruh riwayat transaksi pembayaran kas yang bersangkutan juga akan dihapus permanen.')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">Tidak ada data mahasiswa ditemukan. Silakan tambahkan mahasiswa baru.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detail Mahasiswa & Pembayaran — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header -->
+  <div class="mb-4">
+    <a href="{{ url_for('mahasiswa.index') }}" class="text-muted" style="font-size: 0.85rem;"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Mahasiswa</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Detail <span class="gradient-text">Mahasiswa & Kas</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola pembayaran kas mingguan, pilih semester, dan lihat rekap kemajuan keuangan mahasiswa.</p>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Left Column: Biodata & Semester Progress Summary -->
+    <div class="col-lg-5">
+      <!-- 1. Biodata Card -->
+      <div class="glass-card p-4 mb-4">
+        <h5 class="fw-700 text-white mb-3"><i class="bi bi-person-lines-fill text-indigo me-2"></i> Biodata Mahasiswa</h5>
+        
+        <div class="d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between border-bottom border-glass pb-2">
+            <span class="text-muted" style="font-size: 0.85rem;">NIM</span>
+            <span class="fw-700 text-white" style="font-size: 0.9rem;">{{ mahasiswa.nim }}</span>
+          </div>
+          <div class="d-flex justify-content-between border-bottom border-glass pb-2">
+            <span class="text-muted" style="font-size: 0.85rem;">Nama Lengkap</span>
+            <span class="fw-600 text-light" style="font-size: 0.9rem;">{{ mahasiswa.nama }}</span>
+          </div>
+          <div class="d-flex justify-content-between border-bottom border-glass pb-2">
+            <span class="text-muted" style="font-size: 0.85rem;">Kelas</span>
+            <span class="text-white" style="font-size: 0.9rem;">{{ mahasiswa.kelas }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted" style="font-size: 0.85rem;">Status Keaktifan</span>
+            <span>
+              {% if mahasiswa.status_mahasiswa == 'Aktif' %}
+                <span class="badge bg-emerald text-emerald" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Aktif</span>
+              {% else %}
+                <span class="badge bg-rose text-rose" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Nonaktif</span>
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Semester Summary Card -->
+      {% if selected_semester %}
+        <div class="glass-card p-4">
+          <h5 class="fw-700 text-white mb-3"><i class="bi bi-bar-chart-steps text-emerald me-2"></i> Ringkasan Semester</h5>
+          <div class="mb-3">
+            <label for="sem_select" class="text-muted mb-1" style="font-size: 0.75rem;">Pilih Semester:</label>
+            <select id="sem_select" class="form-select border-glass text-white bg-dark" onchange="location = this.value;" style="font-size: 0.85rem;">
+              {% for sem in semesters %}
+                <option value="{{ url_for('pembayaran.detail', id=mahasiswa.id, semester_id=sem.id) }}" {% if selected_semester.id == sem.id %}selected{% endif %}>{{ sem.nama_semester }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-flex flex-column gap-2 mb-4">
+            <div class="d-flex justify-content-between pb-1" style="font-size: 0.85rem;">
+              <span class="text-muted">Target Pembayaran:</span>
+              <span class="text-white fw-600">Rp {{ "{:,.0f}".format(summary.target).replace(",", ".") }}</span>
+            </div>
+            <div class="d-flex justify-content-between pb-1" style="font-size: 0.85rem;">
+              <span class="text-muted">Total Pembayaran:</span>
+              <span class="text-emerald fw-600">Rp {{ "{:,.0f}".format(summary.paid).replace(",", ".") }}</span>
+            </div>
+            <div class="d-flex justify-content-between pb-1" style="font-size: 0.85rem;">
+              <span class="text-muted">Sisa Tagihan:</span>
+              <span class="text-rose fw-600">Rp {{ "{:,.0f}".format(summary.remaining).replace(",", ".") }}</span>
+            </div>
+            <div class="d-flex justify-content-between pb-1" style="font-size: 0.85rem;">
+              <span class="text-muted">Status Semester:</span>
+              <span>
+                {% if summary.status == 'Lunas' %}
+                  <span class="badge bg-emerald text-emerald" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Lunas</span>
+                {% else %}
+                  <span class="badge bg-rose text-rose" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Belum Lunas</span>
+                {% endif %}
+              </span>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div>
+            <div class="d-flex justify-content-between mb-1" style="font-size: 0.78rem;">
+              <span class="text-muted">Progress Pembayaran</span>
+              <span class="text-emerald fw-600">{{ summary.percentage }}%</span>
+            </div>
+            <div class="progress" style="height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px;">
+              <div class="progress-bar" role="progressbar" 
+                   style="width: {{ summary.percentage }}%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="alert alert-warning border-glass" style="background: rgba(245,158,11,0.1); color: #fcd34d;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> Belum ada data semester aktif di sistem. Silakan buat semester terlebih dahulu di menu Data Semester.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: Checkbox Pembayaran Kas Mingguan -->
+    <div class="col-lg-7">
+      {% if selected_semester %}
+        <div class="glass-card p-4">
+          <h5 class="fw-700 text-white mb-3"><i class="bi bi-calendar3 text-amber me-2"></i> Pembayaran Kas Mingguan</h5>
+          
+          <!-- Dropdown Bulan -->
+          <div class="mb-4">
+            <label for="bulan_select" class="text-muted mb-1" style="font-size: 0.75rem;">Pilih Bulan Pembayaran:</label>
+            <select id="bulan_select" class="form-select border-glass text-white bg-dark mb-3" onchange="location = this.value;" style="font-size: 0.9rem;">
+              {% for m in months %}
+                <option value="{{ url_for('pembayaran.detail', id=mahasiswa.id, semester_id=selected_semester.id, bulan_id=m.id) }}" {% if selected_bulan and selected_bulan.id == m.id %}selected{% endif %}>{{ m.nama_bulan }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Checkbox Pembayaran Form -->
+          {% if selected_bulan %}
+            <div class="p-3 rounded border border-glass mb-4" style="background: rgba(255,255,255,0.015);">
+              <h6 class="fw-700 text-white mb-2">Bulan: {{ selected_bulan.nama_bulan }}</h6>
+              <p class="text-muted mb-4" style="font-size: 0.82rem;">Centang minggu pembayaran yang ingin disimpan. Nominal kas per minggu sebesar <strong class="text-emerald">Rp {{ "{:,.0f}".format(selected_semester.nominal_per_minggu).replace(",", ".") }}</strong>.</p>
+              
+              <form action="{{ url_for('pembayaran.simpan', id=mahasiswa.id) }}" method="POST">
+                <input type="hidden" name="semester_id" value="{{ selected_semester.id }}">
+                <input type="hidden" name="bulan_id" value="{{ selected_bulan.id }}">
+                
+                <div class="d-flex flex-column gap-3 mb-4">
+                  {% for wk in range(1, selected_semester.jumlah_minggu + 1) %}
+                    <div class="form-check p-3 rounded border border-glass d-flex align-items-center" style="background: rgba(255,255,255,0.01); transition: var(--transition);">
+                      <input class="form-check-input ms-0 me-3" type="checkbox" name="weeks" value="{{ wk }}" id="week_{{ wk }}" {% if weeks_payment_status[wk] %}checked{% endif %} style="width: 1.25rem; height: 1.25rem;">
+                      <label class="form-check-label text-light fw-600 flex-grow-1" for="week_{{ wk }}" style="font-size: 0.88rem;">
+                        Minggu ke-{{ wk }} <span class="text-muted fw-400 ms-2">(Rp {{ "{:,.0f}".format(selected_semester.nominal_per_minggu).replace(",", ".") }})</span>
+                      </label>
+                      {% if weeks_payment_status[wk] %}
+                        <span class="badge bg-emerald text-emerald" style="font-size: 0.65rem;">Lunas</span>
+                      {% else %}
+                        <span class="badge bg-rose text-rose" style="font-size: 0.65rem;">Belum Bayar</span>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-primary-custom w-100 justify-content-center py-2.5 fw-700">
+                  <i class="bi bi-check2-circle"></i> Simpan Pembayaran
+                </button>
+              </form>
+            </div>
+          {% else %}
+            <p class="text-muted text-center py-4">Belum ada daftar bulan pembayaran untuk semester ini.</p>
+          {% endif %}
+
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
