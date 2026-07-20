@@ -1,0 +1,46 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Edit Pengeluaran — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  <div class="mb-4">
+    <a href="{{ url_for('pengeluaran.kelola') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Edit <span class="gradient-text">Pengeluaran</span></h2>
+    <p class="text-muted mb-0" style="font-size:0.9rem;">Saldo kas tersedia (termasuk pengeluaran ini): <strong class="text-amber">Rp {{ "{:,.0f}".format(saldo).replace(",", ".") }}</strong></p>
+  </div>
+
+  <div class="glass-card p-4 p-md-5">
+    <form action="{{ url_for('pengeluaran.edit', id=expense.id) }}" method="POST" class="needs-validation" novalidate data-form-type="pengeluaran" data-saldo="{{ saldo }}">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Tanggal</label>
+          <input type="date" class="form-control border-glass text-white bg-dark" name="tanggal" value="{{ expense.tanggal.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Kategori</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" name="kategori" value="{{ expense.kategori }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Keperluan</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" name="keperluan" value="{{ expense.keperluan }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Nominal (Rp)</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" name="nominal" value="{{ expense.nominal }}" min="1" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Keterangan</label>
+          <textarea class="form-control border-glass text-white bg-dark" name="keterangan" rows="3">{{ expense.keterangan or '' }}</textarea>
+        </div>
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700"><i class="bi bi-save"></i> Perbarui Pengeluaran</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  (() => { 'use strict'; const forms = document.querySelectorAll('.needs-validation'); Array.from(forms).forEach(f => { f.addEventListener('submit', e => { if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); } f.classList.add('was-validated'); }); }); })();
+</script>
+{% endblock %}

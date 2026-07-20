@@ -1,0 +1,32 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Pembayaran Kas — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <a href="{{ url_for('kelola_data.index') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali ke Kelola Data</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Pembayaran <span class="gradient-text">Kas</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola pembayaran mingguan mahasiswa atau lihat riwayat transaksi.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4 col-sm-6">
+      <a href="{{ url_for('pembayaran.kelola') }}" class="nav-card">
+        <div class="nav-card-icon bg-emerald">📝</div>
+        <div class="nav-card-label">Kelola</div>
+        <div class="nav-card-desc">Centang pembayaran mingguan mahasiswa</div>
+      </a>
+    </div>
+    <div class="col-md-4 col-sm-6">
+      <a href="{{ url_for('rekap.index') }}" class="nav-card">
+        <div class="nav-card-icon bg-sky">📜</div>
+        <div class="nav-card-label">Riwayat</div>
+        <div class="nav-card-desc">Riwayat seluruh transaksi pembayaran</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

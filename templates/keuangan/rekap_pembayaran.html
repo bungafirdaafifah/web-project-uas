@@ -1,0 +1,97 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Rekap Pembayaran Kas — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+      <h2 class="fw-800 text-white mb-0">Rekap <span class="gradient-text">Pembayaran Kas</span></h2>
+      <p class="text-muted mb-0" style="font-size: 0.9rem;">Riwayat seluruh transaksi pembayaran kas mahasiswa, dapat difilter per semester dan mahasiswa.</p>
+    </div>
+  </div>
+
+  <!-- Filter Form -->
+  <form method="GET" action="{{ url_for('rekap.index') }}" class="glass-card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="text-muted mb-1" style="font-size: 0.78rem;">Filter Semester:</label>
+        <select name="semester_id" class="form-select border-glass text-white bg-dark" style="font-size: 0.88rem;">
+          <option value="">Semua Semester</option>
+          {% for sem in semesters %}
+            <option value="{{ sem.id }}" {% if selected_semester and selected_semester.id == sem.id %}selected{% endif %}>{{ sem.nama_semester }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="text-muted mb-1" style="font-size: 0.78rem;">Filter Mahasiswa:</label>
+        <select name="mahasiswa_id" class="form-select border-glass text-white bg-dark" style="font-size: 0.88rem;">
+          <option value="">Semua Mahasiswa</option>
+          {% for mhs in mahasiswas %}
+            <option value="{{ mhs.id }}" {% if selected_mahasiswa and selected_mahasiswa.id == mhs.id %}selected{% endif %}>{{ mhs.nama }} ({{ mhs.nim }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn-primary-custom w-100 justify-content-center py-2">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+      </div>
+      <div class="col-md-2">
+        <a href="{{ url_for('rekap.index') }}" class="btn-secondary-custom w-100 justify-content-center py-2">
+          <i class="bi bi-x-lg"></i> Reset
+        </a>
+      </div>
+    </div>
+  </form>
+
+  <!-- Total Summary Strip -->
+  <div class="d-flex align-items-center gap-4 mb-3 px-1">
+    <span class="text-muted" style="font-size: 0.85rem;">Total Transaksi: <strong class="text-white">{{ payments | length }}</strong></span>
+    <span class="text-muted" style="font-size: 0.85rem;">Total Nominal: <strong class="text-emerald">Rp {{ "{:,.0f}".format(total_nominal).replace(",", ".") }}</strong></span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-custom align-middle">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Mahasiswa</th>
+          <th>NIM</th>
+          <th>Semester</th>
+          <th>Bulan</th>
+          <th class="text-center">Minggu ke-</th>
+          <th>Tanggal Bayar</th>
+          <th class="text-end">Nominal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if payments %}
+          {% for p in payments %}
+            <tr>
+              <td class="text-muted" style="font-size: 0.8rem;">{{ loop.index }}</td>
+              <td class="fw-600 text-light">{{ p.mahasiswa.nama }}</td>
+              <td class="text-muted" style="font-size: 0.82rem;">{{ p.mahasiswa.nim }}</td>
+              <td>{{ p.semester.nama_semester }}</td>
+              <td>{{ p.bulan.nama_bulan }}</td>
+              <td class="text-center">{{ p.minggu_ke }}</td>
+              <td class="text-muted" style="font-size: 0.82rem;">
+                {{ p.tanggal_bayar.strftime('%d %b %Y') if p.tanggal_bayar else '—' }}
+              </td>
+              <td class="text-end text-emerald fw-600">Rp {{ "{:,.0f}".format(p.nominal).replace(",", ".") }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">Tidak ada data transaksi pembayaran yang cocok dengan filter.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

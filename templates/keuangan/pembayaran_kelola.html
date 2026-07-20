@@ -1,0 +1,80 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Kelola Pembayaran — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <a href="{{ url_for('pembayaran.index') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Kelola <span class="gradient-text">Pembayaran</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Pilih semester, lalu klik Detail untuk mencatat pembayaran mingguan mahasiswa.</p>
+  </div>
+
+  <form method="GET" class="glass-card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="text-muted mb-1" style="font-size: 0.78rem;">Pilih Semester:</label>
+        <select name="semester_id" class="form-select border-glass text-white bg-dark" onchange="this.form.submit()" style="font-size: 0.88rem;">
+          {% for sem in semesters %}
+          <option value="{{ sem.id }}" {% if selected_semester and selected_semester.id == sem.id %}selected{% endif %}>{{ sem.nama_semester }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  {% if not selected_semester %}
+  <div class="glass-card p-5 text-center">
+    <p class="text-muted mb-0">Belum ada data semester. Silakan tambah semester terlebih dahulu.</p>
+  </div>
+  {% else %}
+  <div class="table-responsive">
+    <table class="table table-custom align-middle">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama Mahasiswa</th>
+          <th>NIM</th>
+          <th style="width:220px;">Progress</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="text-muted" style="font-size:0.8rem;">{{ loop.index }}</td>
+          <td class="fw-600 text-light">{{ row.mahasiswa.nama }}</td>
+          <td class="text-muted" style="font-size:0.82rem;">{{ row.mahasiswa.nim }}</td>
+          <td>
+            <div class="progress" style="height:8px; background:rgba(255,255,255,0.07); border-radius:4px;">
+              <div class="progress-bar" style="width:{{ row.progress }}%; background:linear-gradient(90deg,var(--primary),var(--secondary)); border-radius:4px;"></div>
+            </div>
+            <span class="text-muted" style="font-size:0.75rem;">{{ row.progress }}%</span>
+          </td>
+          <td class="text-center">
+            {% if row.status == 'Lunas' %}
+            <span class="badge-item" style="background:rgba(16,185,129,0.15); color:#34d399;">🟢 Lunas</span>
+            {% elif row.status == 'Dicicil' %}
+            <span class="badge-item" style="background:rgba(245,158,11,0.15); color:#fbbf24;">🟡 Dicicil</span>
+            {% else %}
+            <span class="badge-item" style="background:rgba(239,68,68,0.15); color:#f87171;">🔴 Belum</span>
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <a href="{{ url_for('pembayaran.detail', id=row.mahasiswa.id, semester_id=selected_semester.id) }}" class="btn btn-sm btn-primary-custom py-1 px-3" style="font-size:0.75rem; box-shadow:none;">
+              <i class="bi bi-pencil-square"></i> Detail
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Belum ada mahasiswa aktif.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Riwayat Pengeluaran — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <a href="{{ url_for('pengeluaran.index') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Riwayat <span class="gradient-text">Pengeluaran</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Riwayat seluruh pengeluaran kas, dapat difilter per semester.</p>
+  </div>
+
+  <form method="GET" action="{{ url_for('pengeluaran.riwayat') }}" class="glass-card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="text-muted mb-1" style="font-size: 0.78rem;">Filter Semester:</label>
+        <select name="semester_id" class="form-select border-glass text-white bg-dark" style="font-size: 0.88rem;">
+          <option value="">Semua Semester</option>
+          {% for sem in semesters %}
+            <option value="{{ sem.id }}" {% if selected_semester and selected_semester.id == sem.id %}selected{% endif %}>{{ sem.nama_semester }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn-primary-custom w-100 justify-content-center py-2">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+      </div>
+      <div class="col-md-2">
+        <a href="{{ url_for('pengeluaran.riwayat') }}" class="btn-secondary-custom w-100 justify-content-center py-2">
+          <i class="bi bi-x-lg"></i> Reset
+        </a>
+      </div>
+    </div>
+  </form>
+
+  <div class="d-flex align-items-center gap-4 mb-3 px-1">
+    <span class="text-muted" style="font-size: 0.85rem;">Total Transaksi: <strong class="text-white">{{ expenses | length }}</strong></span>
+    <span class="text-muted" style="font-size: 0.85rem;">Total Nominal: <strong class="text-rose">Rp {{ "{:,.0f}".format(total_nominal).replace(",", ".") }}</strong></span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom align-middle">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tanggal</th>
+          <th>Kategori</th>
+          <th>Keperluan</th>
+          <th class="text-end">Nominal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if expenses %}
+          {% for e in expenses %}
+          <tr>
+            <td class="text-muted" style="font-size:0.8rem;">{{ loop.index }}</td>
+            <td class="text-muted" style="font-size:0.82rem;">{{ e.tanggal.strftime('%d %b %Y') }}</td>
+            <td><span class="badge-item">{{ e.kategori }}</span></td>
+            <td>{{ e.keperluan }}</td>
+            <td class="text-end text-rose fw-600">Rp {{ "{:,.0f}".format(e.nominal).replace(",", ".") }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Belum ada data pengeluaran yang cocok dengan filter.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
