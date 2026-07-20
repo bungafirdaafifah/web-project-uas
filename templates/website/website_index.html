@@ -1,0 +1,31 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Kelola Website — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <h2 class="fw-800 text-white mb-0">Kelola <span class="gradient-text">Website</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Ubah konten halaman publik. Perubahan langsung tampil setelah disimpan.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4 col-sm-6">
+      <a href="{{ url_for('website.beranda') }}" class="nav-card">
+        <div class="nav-card-icon bg-indigo">🏠</div>
+        <div class="nav-card-label">Beranda</div>
+        <div class="nav-card-desc">Logo, judul, deskripsi, fitur unggulan</div>
+      </a>
+    </div>
+    <div class="col-md-4 col-sm-6">
+      <a href="{{ url_for('website.tentang') }}" class="nav-card">
+        <div class="nav-card-icon bg-violet">❓</div>
+        <div class="nav-card-label">Tentang</div>
+        <div class="nav-card-desc">Konten tentang aplikasi</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

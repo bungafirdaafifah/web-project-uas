@@ -1,0 +1,103 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Kelola Beranda — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <a href="{{ url_for('website.index') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Kelola <span class="gradient-text">Beranda</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Konten ini akan langsung tampil di halaman Beranda publik.</p>
+  </div>
+
+  <!-- Form Hero Content -->
+  <div class="glass-card p-4 mb-4">
+    <h5 class="fw-700 text-white mb-3">Konten Hero</h5>
+    <form method="POST" action="{{ url_for('website.beranda') }}" enctype="multipart/form-data">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Logo</label>
+          <input type="file" name="logo" class="form-control border-glass text-white bg-dark" accept=".png,.jpg,.jpeg">
+          {% if settings.logo_filename %}
+          <p class="text-muted mt-1 mb-0" style="font-size:0.78rem;">Logo saat ini: {{ settings.logo_filename }}</p>
+          {% endif %}
+        </div>
+        <div class="col-12">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Judul</label>
+          <input type="text" name="hero_judul" class="form-control border-glass text-white bg-dark" value="{{ settings.hero_judul }}" required maxlength="200">
+        </div>
+        <div class="col-12">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Deskripsi</label>
+          <textarea name="hero_deskripsi" rows="3" class="form-control border-glass text-white bg-dark" required>{{ settings.hero_deskripsi }}</textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary-custom mt-3">
+        <i class="bi bi-save"></i> Simpan
+      </button>
+    </form>
+  </div>
+
+  <!-- Fitur Unggulan CRUD -->
+  <div class="glass-card p-4">
+    <h5 class="fw-700 text-white mb-3">Fitur Unggulan</h5>
+
+    <div class="table-responsive mb-4">
+      {% for f in fitur_list %}
+      <form action="{{ url_for('website.fitur_edit', id=f.id) }}" method="POST" id="edit-form-{{ f.id }}"></form>
+      {% endfor %}
+      <table class="table table-custom align-middle">
+        <thead>
+          <tr>
+            <th style="width:70px;">Icon</th>
+            <th>Teks</th>
+            <th class="text-center" style="width:180px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in fitur_list %}
+          <tr>
+            <td>
+              <input type="text" form="edit-form-{{ f.id }}" name="icon" value="{{ f.icon }}" class="form-control form-control-sm border-glass text-white bg-dark text-center" maxlength="10">
+            </td>
+            <td>
+              <input type="text" form="edit-form-{{ f.id }}" name="teks" value="{{ f.teks }}" class="form-control form-control-sm border-glass text-white bg-dark" maxlength="150" required>
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <button type="submit" form="edit-form-{{ f.id }}" class="btn btn-sm btn-outline-warning" title="Simpan">
+                  <i class="bi bi-save"></i>
+                </button>
+                <form action="{{ url_for('website.fitur_hapus', id=f.id) }}" method="POST" onsubmit="return confirm('Hapus fitur ini?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">Belum ada fitur unggulan.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h6 class="fw-700 text-white mb-2" style="font-size:0.9rem;">Tambah Fitur Baru</h6>
+    <form method="POST" action="{{ url_for('website.fitur_tambah') }}" class="row g-2 align-items-end">
+      <div class="col-auto">
+        <input type="text" name="icon" placeholder="⭐" class="form-control border-glass text-white bg-dark text-center" style="width:70px;" maxlength="10">
+      </div>
+      <div class="col">
+        <input type="text" name="teks" placeholder="Teks fitur..." class="form-control border-glass text-white bg-dark" maxlength="150" required>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn-primary-custom">
+          <i class="bi bi-plus-lg"></i> Tambah
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

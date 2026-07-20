@@ -1,0 +1,39 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Kelola Tentang — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <a href="{{ url_for('website.index') }}" class="text-muted" style="font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Kembali</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Kelola <span class="gradient-text">Tentang</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Konten ini akan langsung tampil di halaman Tentang publik.</p>
+  </div>
+
+  <!-- Form Konten Tentang -->
+  <div class="glass-card p-4 mb-4">
+    <h5 class="fw-700 text-white mb-3">Konten Tentang</h5>
+    <form method="POST" action="{{ url_for('website.tentang') }}">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Tentang Aplikasi</label>
+          <textarea name="deskripsi_tentang" rows="3" class="form-control border-glass text-white bg-dark" required>{{ konten.deskripsi_tentang }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Tujuan Aplikasi</label>
+          <textarea name="tujuan" rows="3" class="form-control border-glass text-white bg-dark" required>{{ konten.tujuan }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="text-muted mb-1" style="font-size:0.8rem;">Cara Kerja Sistem</label>
+          <textarea name="cara_kerja" rows="3" class="form-control border-glass text-white bg-dark" required>{{ konten.cara_kerja }}</textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary-custom mt-3">
+        <i class="bi bi-save"></i> Simpan
+      </button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Kelola Data — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <h2 class="fw-800 text-white mb-0">Kelola <span class="gradient-text">Data</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Pilih data yang ingin dikelola.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-3 col-sm-6">
+      <a href="{{ url_for('mahasiswa.index') }}" class="nav-card">
+        <div class="nav-card-icon bg-indigo">👨‍🎓</div>
+        <div class="nav-card-label">Mahasiswa</div>
+        <div class="nav-card-desc">Tambah, edit, hapus, cari</div>
+      </a>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <a href="{{ url_for('semester.index') }}" class="nav-card">
+        <div class="nav-card-icon bg-violet">📅</div>
+        <div class="nav-card-label">Semester</div>
+        <div class="nav-card-desc">Tambah, edit, hapus</div>
+      </a>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <a href="{{ url_for('pembayaran.index') }}" class="nav-card">
+        <div class="nav-card-icon bg-emerald">💳</div>
+        <div class="nav-card-label">Pembayaran Kas</div>
+        <div class="nav-card-desc">Kelola & riwayat</div>
+      </a>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <a href="{{ url_for('pengeluaran.index') }}" class="nav-card">
+        <div class="nav-card-icon bg-amber">🧾</div>
+        <div class="nav-card-label">Pengeluaran Kas</div>
+        <div class="nav-card-desc">Kelola & riwayat</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
