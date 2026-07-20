@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Informasi Kas — KasKu | Manajemen Uang Kas Mahasiswa{% endblock %}
+{% block meta_desc %}Cek status pembayaran kas mahasiswa, ringkasan keuangan per semester, dan hubungi bendahara secara langsung.{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════
+     PAGE HEADER
+════════════════════════════════════════════ -->
+<section style="padding:5rem 0 2.5rem; position:relative; z-index:1;">
+  <div class="container text-center">
+    <span class="section-label">💰 Transparansi Kas</span>
+    <h1 class="section-title mt-2">Informasi <span class="gradient-text">Kas</span></h1>
+    <p class="section-desc mx-auto">
+      Cek status pembayaran kas mahasiswa, ringkasan keuangan, dan hubungi bendahara — semua dalam satu halaman.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     BOOTSTRAP TABS
+════════════════════════════════════════════ -->
+<section style="padding-bottom:5rem; position:relative; z-index:1;">
+  <div class="container">
+
+    <ul class="nav nav-pills ik-tabbar mb-4 reveal" id="ikTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link ik-tab {% if active_tab == 'kas' %}active{% endif %}" id="tab-kas-btn"
+                data-bs-toggle="pill" data-bs-target="#tab-kas" type="button" role="tab"
+                aria-controls="tab-kas" aria-selected="{{ 'true' if active_tab == 'kas' else 'false' }}">
+          <i class="bi bi-clipboard-check-fill"></i> Pembayaran Kas Mahasiswa
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link ik-tab {% if active_tab == 'ringkasan' %}active{% endif %}" id="tab-ringkasan-btn"
+                data-bs-toggle="pill" data-bs-target="#tab-ringkasan" type="button" role="tab"
+                aria-controls="tab-ringkasan" aria-selected="{{ 'true' if active_tab == 'ringkasan' else 'false' }}">
+          <i class="bi bi-graph-up-arrow"></i> Ringkasan Keuangan Semester
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link ik-tab {% if active_tab == 'kontak' %}active{% endif %}" id="tab-kontak-btn"
+                data-bs-toggle="pill" data-bs-target="#tab-kontak" type="button" role="tab"
+                aria-controls="tab-kontak" aria-selected="{{ 'true' if active_tab == 'kontak' else 'false' }}">
+          <i class="bi bi-envelope-fill"></i> Hubungi Bendahara
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="ikTabContent">
+
+      {# ═══════════ TAB 1: PEMBAYARAN KAS MAHASISWA ═══════════ #}
+      <div class="tab-pane fade {% if active_tab == 'kas' %}show active{% endif %}"
+           id="tab-kas" role="tabpanel" aria-labelledby="tab-kas-btn">
+
+        <div class="glass-card p-4 mb-4">
+          <form method="get" class="row g-3 align-items-end">
+            <input type="hidden" name="tab" value="kas">
+            <div class="col-sm-6 col-md-4">
+              <label class="ik-label"><i class="bi bi-calendar3"></i> Pilih Semester</label>
+              <select name="sem_kas" class="form-select ik-select" onchange="this.form.submit()">
+                {% for sem in semesters %}
+                <option value="{{ sem.id }}" {% if semester_kas and sem.id == semester_kas.id %}selected{% endif %}>
+                  {{ sem.nama_semester }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <noscript><div class="col-auto"><button class="btn-primary-custom" type="submit">Tampilkan</button></div></noscript>
+          </form>
+        </div>
+
+        {% if not semester_kas %}
+        <div class="glass-card p-5 text-center">
+          <i class="bi bi-inboxes" style="font-size:2.5rem; color:var(--text-muted);"></i>
+          <p class="mt-3 mb-0" style="color:var(--text-muted);">Belum ada data semester yang tersedia.</p>
+        </div>
+        {% else %}
+
+        <div class="glass-card p-4">
+          <h5 class="mb-3"><i class="bi bi-clipboard-data"></i> Preview Pembayaran Seluruh Mahasiswa</h5>
+          <div class="table-responsive ik-table-scroll">
+            <table class="ik-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="width:36px; vertical-align:middle;">No</th>
+                  <th rowspan="2" style="min-width:150px; vertical-align:middle;">Nama Mahasiswa</th>
+                  {% for b in months_kas %}
+                  <th colspan="{{ semester_kas.jumlah_minggu }}" class="text-center">{{ b.nama_bulan }}</th>
+                  {% endfor %}
+                  <th rowspan="2" class="text-end" style="vertical-align:middle;">Jumlah Pembayaran</th>
+                  <th rowspan="2" class="text-center" style="vertical-align:middle; width:90px;">Persentase</th>
+                </tr>
+                <tr>
+                  {% for b in months_kas %}
+                    {% for wk in range(1, semester_kas.jumlah_minggu + 1) %}
+                    <th class="text-center ik-week-col">M{{ wk }}</th>
+                    {% endfor %}
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in student_rows %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ row.nama }}</td>
+                  {% for weeks in row.bulan_status %}
+                    {% for w in weeks %}
+                    <td class="text-center ik-week-col">
+                      <input type="checkbox" class="ik-checkbox" disabled {% if w %}checked{% endif %}>
+                    </td>
+                    {% endfor %}
+                  {% endfor %}
+                  <td class="text-end text-emerald fw-600">Rp {{ "{:,.0f}".format(row.jumlah_pembayaran).replace(",", ".") }}</td>
+                  <td class="text-center">
+                    <span class="ik-percent {% if row.persentase >= 100 %}ik-percent-full{% elif row.persentase > 0 %}ik-percent-partial{% else %}ik-percent-empty{% endif %}">
+                      {{ row.persentase }}%
+                    </span>
+                  </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="{{ (months_kas|length * semester_kas.jumlah_minggu) + 4 }}" class="text-center py-4" style="color:var(--text-muted);">Belum ada data mahasiswa aktif.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-3 mb-0" style="color:var(--text-muted); font-size:0.85rem;">
+            <i class="bi bi-lock-fill"></i> Data hanya dapat dilihat (Read Only). Perubahan status pembayaran hanya dapat dilakukan oleh admin melalui Dashboard.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+
+      {# ═══════════ TAB 2: RINGKASAN KEUANGAN SEMESTER ═══════════ #}
+      <div class="tab-pane fade {% if active_tab == 'ringkasan' %}show active{% endif %}"
+           id="tab-ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan-btn">
+
+        <div class="glass-card p-4 mb-4">
+          <form method="get" class="row g-3 align-items-end">
+            <input type="hidden" name="tab" value="ringkasan">
+            <div class="col-sm-6 col-md-4">
+              <label class="ik-label"><i class="bi bi-calendar3"></i> Pilih Semester</label>
+              <select name="sem_ringkasan" class="form-select ik-select" onchange="this.form.submit()">
+                {% for sem in semesters %}
+                <option value="{{ sem.id }}" {% if semester_ringkasan and sem.id == semester_ringkasan.id %}selected{% endif %}>
+                  {{ sem.nama_semester }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <noscript><div class="col-auto"><button class="btn-primary-custom" type="submit">Tampilkan</button></div></noscript>
+          </form>
+        </div>
+
+        {% if not semester_ringkasan %}
+        <div class="glass-card p-5 text-center">
+          <i class="bi bi-inboxes" style="font-size:2.5rem; color:var(--text-muted);"></i>
+          <p class="mt-3 mb-0" style="color:var(--text-muted);">Belum ada data semester yang tersedia.</p>
+        </div>
+        {% else %}
+
+        <!-- Cards Ringkasan -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="ik-summary-card">
+              <div class="ik-summary-icon bg-emerald"><i class="bi bi-graph-up-arrow"></i></div>
+              <p class="ik-summary-label">Total Pendapatan</p>
+              <p class="ik-summary-value text-emerald">Rp {{ "{:,.0f}".format(total_pendapatan).replace(",", ".") }}</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="ik-summary-card">
+              <div class="ik-summary-icon bg-rose"><i class="bi bi-graph-down-arrow"></i></div>
+              <p class="ik-summary-label">Total Pengeluaran</p>
+              <p class="ik-summary-value text-rose">Rp {{ "{:,.0f}".format(total_pengeluaran).replace(",", ".") }}</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="ik-summary-card">
+              <div class="ik-summary-icon bg-amber"><i class="bi bi-wallet2"></i></div>
+              <p class="ik-summary-label">Saldo Kas</p>
+              <p class="ik-summary-value text-amber">Rp {{ "{:,.0f}".format(saldo_kas).replace(",", ".") }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4">
+          <h5 class="mb-3"><i class="bi bi-receipt"></i> Detail Pengeluaran</h5>
+          <div class="table-responsive">
+            <table class="ik-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Keperluan</th>
+                  <th class="text-end">Nominal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in detail_pengeluaran %}
+                <tr>
+                  <td>{{ e.tanggal.strftime('%d %B %Y') }}</td>
+                  <td>{{ e.keperluan }}</td>
+                  <td class="text-end text-rose fw-600">Rp {{ "{:,.0f}".format(e.nominal).replace(",", ".") }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="text-center py-4" style="color:var(--text-muted);">Belum ada pengeluaran pada semester ini.</td></tr>
+                {% endfor %}
+              </tbody>
+              {% if detail_pengeluaran %}
+              <tfoot>
+                <tr class="ik-total-row">
+                  <td colspan="2">Total Pengeluaran</td>
+                  <td class="text-end text-rose fw-700">Rp {{ "{:,.0f}".format(total_pengeluaran).replace(",", ".") }}</td>
+                </tr>
+              </tfoot>
+              {% endif %}
+            </table>
+          </div>
+          <p class="mt-3 mb-0" style="color:var(--text-muted); font-size:0.85rem;">
+            <i class="bi bi-lock-fill"></i> Data bersifat Read Only, dihitung otomatis dari database sesuai semester yang dipilih.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+
+      {# ═══════════ TAB 3: HUBUNGI BENDAHARA ═══════════ #}
+      <div class="tab-pane fade {% if active_tab == 'kontak' %}show active{% endif %}"
+           id="tab-kontak" role="tabpanel" aria-labelledby="tab-kontak-btn">
+
+        <div class="row justify-content-center">
+          <div class="col-lg-7">
+            <div class="glass-card p-4 p-md-5">
+              <h5 class="mb-1"><i class="bi bi-envelope-fill"></i> Hubungi Bendahara</h5>
+              <p style="color:var(--text-muted); font-size:0.88rem;" class="mb-4">
+                Ada pertanyaan atau kendala seputar pembayaran kas? Kirim pesan langsung kepada bendahara.
+              </p>
+
+              <form method="POST" action="{{ url_for('public.kirim_pesan') }}">
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <label class="ik-label">Nama <span class="text-rose">*</span></label>
+                    <input type="text" name="nama" class="form-control ik-select" required maxlength="100">
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="ik-label">NIM <span style="color:var(--text-muted);">(opsional)</span></label>
+                    <input type="text" name="nim" class="form-control ik-select" maxlength="50">
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="ik-label">Email <span style="color:var(--text-muted);">(opsional)</span></label>
+                    <input type="email" name="email" class="form-control ik-select" maxlength="100">
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="ik-label">Subjek <span class="text-rose">*</span></label>
+                    <input type="text" name="subjek" class="form-control ik-select" required maxlength="200">
+                  </div>
+                  <div class="col-12">
+                    <label class="ik-label">Pesan <span class="text-rose">*</span></label>
+                    <textarea name="isi_pesan" rows="5" class="form-control ik-select" required></textarea>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary-custom mt-4">
+                  <i class="bi bi-send-fill"></i> Kirim Pesan
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+
+  </div>
+</section>
+
+<style>
+  .ik-tabbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 0.4rem;
+  }
+  .ik-tab {
+    text-align: center;
+    padding: 0.7rem 1.1rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted) !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: var(--transition);
+    background: transparent;
+    border: none;
+  }
+  .ik-tab:hover { color: var(--text-white) !important; background: var(--bg-card-hover); }
+  .ik-tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    color: #fff !important;
+    box-shadow: var(--shadow-btn);
+  }
+  .ik-label {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+  .ik-select, textarea.ik-select {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: var(--text-white) !important;
+  }
+  .ik-select:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.25) !important; border-color: var(--primary) !important; }
+  .ik-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--text-light);
+    font-size: 0.88rem;
+  }
+  .ik-table thead th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.6rem 0.6rem;
+    border-bottom: 1px solid var(--border-glass);
+    white-space: nowrap;
+  }
+  .ik-table tbody td {
+    padding: 0.65rem 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    white-space: nowrap;
+  }
+  .ik-table tbody tr:hover { background: var(--bg-card-hover); }
+  .ik-week-col { width: 40px; }
+  .ik-table-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+  }
+  .ik-table-scroll thead th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-dark);
+    z-index: 2;
+  }
+  .ik-checkbox {
+    width: 16px; height: 16px;
+    accent-color: #6b7280;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+  .ik-checkbox:checked {
+    accent-color: #10b981;
+  }
+  .ik-percent {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+  .ik-percent-full { background: rgba(16,185,129,0.15); color: #34d399; }
+  .ik-percent-partial { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .ik-percent-empty { background: rgba(239,68,68,0.15); color: #f87171; }
+  .ik-total-row td { border-top: 1px solid var(--border-glass); border-bottom: none; font-size: 0.95rem; }
+  .ik-summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    height: 100%;
+  }
+  .ik-summary-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin: 0 auto 0.8rem;
+  }
+  .ik-summary-label { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.3rem; }
+  .ik-summary-value { font-size: 1.4rem; font-weight: 800; margin: 0; }
+  .fw-600 { font-weight: 600; }
+  .fw-700 { font-weight: 700; }
+</style>
+
+{% endblock %}

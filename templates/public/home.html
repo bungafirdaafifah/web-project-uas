@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}KasKu — Beranda | Manajemen Uang Kas Mahasiswa{% endblock %}
+{% block meta_desc %}Selamat datang di KasKu, sistem manajemen uang kas mahasiswa berbasis web. Kelola kas organisasi Anda secara digital, transparan, dan efisien.{% endblock %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block extra_css %}
+<style>
+  body.landing-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  body.landing-page main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  .landing-hero {
+    width: 100%;
+    padding: 2.5rem 0;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .landing-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .landing-feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.85rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-light);
+    transition: var(--transition);
+  }
+  .landing-feature-list li:hover {
+    background: var(--bg-card-hover);
+    transform: translateX(4px);
+  }
+  .landing-feature-list li .emoji {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  body.landing-page .site-footer {
+    padding: 1.25rem 0;
+  }
+  body.landing-page .footer-bottom {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  @media (max-width: 991px) {
+    body.landing-page main { align-items: flex-start; }
+    .landing-hero { padding: 2.5rem 0 1.5rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="landing-hero">
+  <div class="hero-bg"></div>
+  <div class="container position-relative" style="z-index:2;">
+    <div class="row align-items-center g-5">
+
+      <!-- Left: Copy -->
+      <div class="col-lg-6">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Sistem Manajemen Kas Digital
+        </div>
+
+        <h1 class="hero-title">
+          {{ settings.hero_judul }}
+        </h1>
+
+        <p class="hero-subtitle">
+          {{ settings.hero_deskripsi }}
+        </p>
+
+        <div class="hero-actions">
+          <a href="{{ url_for('public.informasi_kas') }}" class="btn-primary-custom">
+            <i class="bi bi-rocket-takeoff-fill"></i>
+            Mulai Sekarang
+          </a>
+          <a href="{{ url_for('public.tentang') }}" class="btn-secondary-custom">
+            <i class="bi bi-info-circle"></i>
+            Pelajari Lebih Lanjut
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Fitur Unggulan (list singkat) -->
+      <div class="col-lg-6">
+        <h2 class="section-title mb-4" style="font-size:1.6rem;">🌟 Fitur Unggulan</h2>
+        <ul class="landing-feature-list">
+          {% for f in fitur_list %}
+          <li><span class="emoji">{{ f.icon }}</span> {{ f.teks }}</li>
+          {% else %}
+          <li>Belum ada fitur unggulan.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
