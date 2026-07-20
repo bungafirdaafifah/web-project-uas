@@ -6,17 +6,27 @@ from config import Config
 def create_app():
     app = Flask(__name__)
 
-    print("=== DEBUG VERCEL ===")
-    print("Template folder:", app.template_folder)
-    print("Current working directory:", os.getcwd())
-    print("Template exists:", os.path.exists("templates/public/home.html"))
-    print("====================")
+    # ===== DEBUG =====
+    print("========== DEBUG ==========")
+    print("BASE_DIR =", os.path.dirname(os.path.abspath(__file__)))
+    print("CURRENT =", os.getcwd())
+    print("TEMPLATE FOLDER =", app.template_folder)
+
+    print("ISI ROOT =", os.listdir(os.path.dirname(os.path.abspath(__file__))))
+
+    if os.path.exists("templates"):
+        print("ISI templates =", os.listdir("templates"))
+
+    if os.path.exists("templates/public"):
+        print("ISI templates/public =", os.listdir("templates/public"))
+
+    print("===========================")
+    # ===== END DEBUG =====
 
     app.config.from_object(Config)
     Config.init_app(app)
 
     db.init_app(app)
-
     # Register all blueprints (models & routes are now single consolidated files)
     from routes import (
         public_bp, auth_bp, dashboard_bp, semester_bp, mahasiswa_bp,
