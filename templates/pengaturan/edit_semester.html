@@ -1,0 +1,74 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Edit Semester — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header -->
+  <div class="mb-4">
+    <a href="{{ url_for('semester.index') }}" class="text-muted" style="font-size: 0.85rem;"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Semester</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Ubah <span class="gradient-text">Semester</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Ubah konfigurasi semester: {{ semester.nama_semester }}.</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="glass-card p-4 p-md-5">
+    <form action="{{ url_for('semester.edit', id=semester.id) }}" method="POST" class="needs-validation" novalidate>
+      <div class="row g-4">
+        
+        <!-- Nama Semester (Disabled / Read-only) -->
+        <div class="col-md-6">
+          <label for="nama_semester" class="form-label fw-600 text-muted" style="font-size: 0.85rem;">Nama Semester (Tidak Dapat Diubah)</label>
+          <input type="text" class="form-control border-glass text-muted bg-dark" id="nama_semester" 
+                 value="{{ semester.nama_semester }}" disabled style="opacity: 0.5;">
+        </div>
+
+        <!-- Tahun Akademik -->
+        <div class="col-md-6">
+          <label for="tahun_akademik" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Tahun Akademik</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="tahun_akademik" name="tahun_akademik" 
+                 value="{{ semester.tahun_akademik }}" required>
+          <div class="invalid-feedback">Tahun akademik wajib diisi.</div>
+        </div>
+
+        <!-- Status Aktif -->
+        <div class="col-md-6">
+          <label for="status_aktif" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Status Aktif</label>
+          <select name="status_aktif" id="status_aktif" class="form-select border-glass text-white bg-dark" required style="font-size: 0.9rem;">
+            <option value="1" {% if semester.status_aktif %}selected{% endif %}>Aktif</option>
+            <option value="0" {% if not semester.status_aktif %}selected{% endif %}>Nonaktif</option>
+          </select>
+          <small class="text-muted mt-2 d-block">Nonaktifkan jika semester ini sudah selesai digunakan.</small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700">
+            <i class="bi bi-save"></i> Perbarui Semester
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Form validation script -->
+<script>
+  (() => {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
+{% endblock %}

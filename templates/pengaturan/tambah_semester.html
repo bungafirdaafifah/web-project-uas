@@ -1,0 +1,108 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Tambah Semester Baru — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header -->
+  <div class="mb-4">
+    <a href="{{ url_for('semester.index') }}" class="text-muted" style="font-size: 0.85rem;"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Semester</a>
+    <h2 class="fw-800 text-white mb-0 mt-2">Tambah <span class="gradient-text">Semester Baru</span></h2>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">Buat data semester baru beserta parameter nominal pembayaran kas historis.</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="glass-card p-4 p-md-5">
+    <form action="{{ url_for('semester.tambah') }}" method="POST" class="needs-validation" novalidate>
+      <div class="row g-4">
+        
+        <!-- Nama Semester -->
+        <div class="col-md-6">
+          <label for="nama_semester" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Nama Semester</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="nama_semester" name="nama_semester" 
+                 placeholder="Contoh: Ganjil 2024/2025" required>
+          <div class="invalid-feedback">Nama semester wajib diisi.</div>
+        </div>
+
+        <!-- Tahun Akademik -->
+        <div class="col-md-6">
+          <label for="tahun_akademik" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Tahun Akademik</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" id="tahun_akademik" name="tahun_akademik" 
+                 placeholder="Contoh: 2024/2025" required>
+          <div class="invalid-feedback">Tahun akademik wajib diisi.</div>
+        </div>
+
+        <!-- Nominal Per Bulan -->
+        <div class="col-md-4">
+          <label for="nominal_per_bulan" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Nominal Kas / Bulan (Rp)</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" id="nominal_per_bulan" name="nominal_per_bulan" 
+                 value="15000" min="0" required>
+          <div class="invalid-feedback">Nominal kas bulanan wajib diisi.</div>
+        </div>
+
+        <!-- Nominal Per Minggu -->
+        <div class="col-md-4">
+          <label for="nominal_per_minggu" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Nominal Cicilan / Minggu (Rp)</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" id="nominal_per_minggu" name="nominal_per_minggu" 
+                 value="5000" min="0" required>
+          <div class="invalid-feedback">Nominal kas mingguan wajib diisi.</div>
+        </div>
+
+        <!-- Jumlah Minggu -->
+        <div class="col-md-4">
+          <label for="jumlah_minggu" class="form-label fw-600 text-white" style="font-size: 0.85rem;">Jumlah Minggu Pembayaran / Bulan</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" id="jumlah_minggu" name="jumlah_minggu" 
+                 value="3" min="1" required>
+          <div class="invalid-feedback">Jumlah minggu wajib diisi.</div>
+        </div>
+
+        <!-- Daftar Bulan Checkboxes -->
+        <div class="col-12">
+          <label class="form-label fw-600 text-white d-block mb-3" style="font-size: 0.85rem;">Daftar Bulan Pembayaran</label>
+          
+          <div class="row g-3 bulan-group">
+            {% for m_name in ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] %}
+              <div class="col-6 col-sm-4 col-md-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="months" value="{{ m_name }}" id="m_{{ m_name }}">
+                  <label class="form-check-label text-light" style="font-size: 0.88rem;" for="m_{{ m_name }}">
+                    {{ m_name }}
+                  </label>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <small class="text-muted mt-2 d-block">Pilih bulan yang termasuk dalam cakupan semester ini.</small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700">
+            <i class="bi bi-save"></i> Simpan Semester
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Form validation script -->
+<script>
+  (() => {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
+{% endblock %}

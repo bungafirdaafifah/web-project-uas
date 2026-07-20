@@ -1,0 +1,82 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Pengaturan Sistem — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  <div class="mb-4">
+    <h2 class="fw-800 text-white mb-0">Pengaturan <span class="gradient-text">Sistem</span></h2>
+    <p class="text-muted mb-0" style="font-size:0.9rem;">Konfigurasi nama organisasi, logo, dan parameter keuangan kas. Perubahan <strong>hanya berlaku untuk semester baru</strong> yang dibuat setelah pengaturan disimpan.</p>
+  </div>
+
+  <div class="glass-card p-4 p-md-5 mb-4">
+    <h5 class="fw-700 text-white mb-3">Pengaturan Umum</h5>
+    <form action="{{ url_for('pengaturan.index') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+      <input type="hidden" name="form_type" value="umum">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Nama Organisasi</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" name="nama_organisasi" value="{{ settings.nama_organisasi }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Logo Organisasi</label>
+          <input type="file" class="form-control border-glass text-white bg-dark" name="logo" accept=".png,.jpg,.jpeg">
+          <small class="text-muted mt-1 d-block">Logo saat ini: <strong>{{ settings.logo_filename }}</strong>. Kosongkan jika tidak ingin mengubah.</small>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Nominal Kas / Bulan (Rp)</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" name="nominal_per_bulan" value="{{ settings.nominal_per_bulan }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Nominal Cicilan / Minggu (Rp)</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" name="nominal_per_minggu" value="{{ settings.nominal_per_minggu }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Jumlah Minggu / Bulan</label>
+          <input type="number" class="form-control border-glass text-white bg-dark" name="jumlah_minggu" value="{{ settings.jumlah_minggu }}" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Deskripsi Organisasi</label>
+          <textarea class="form-control border-glass text-white bg-dark" name="deskripsi" rows="3">{{ settings.deskripsi or '' }}</textarea>
+        </div>
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700"><i class="bi bi-save"></i> Simpan Pengaturan</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="glass-card p-4 p-md-5">
+    <h5 class="fw-700 text-white mb-3">Kredensial Admin</h5>
+    <form action="{{ url_for('pengaturan.index') }}" method="POST" class="needs-validation" novalidate>
+      <input type="hidden" name="form_type" value="kredensial">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Username</label>
+          <input type="text" class="form-control border-glass text-white bg-dark" name="username" value="{{ admin.username if admin else '' }}" required>
+        </div>
+        <div class="col-md-6"></div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Password Lama</label>
+          <input type="password" class="form-control border-glass text-white bg-dark" name="password_lama" autocomplete="current-password">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Password Baru</label>
+          <input type="password" class="form-control border-glass text-white bg-dark" name="password_baru" autocomplete="new-password" minlength="6">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-600 text-white" style="font-size:0.85rem;">Konfirmasi Password Baru</label>
+          <input type="password" class="form-control border-glass text-white bg-dark" name="password_konfirmasi" autocomplete="new-password" minlength="6">
+        </div>
+        <p class="text-muted mb-0" style="font-size:0.8rem;">Kosongkan kolom password jika hanya ingin mengubah username.</p>
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn-primary-custom py-2 px-4 fw-700"><i class="bi bi-shield-lock"></i> Simpan Kredensial</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  (() => { 'use strict'; const forms = document.querySelectorAll('.needs-validation'); Array.from(forms).forEach(f => { f.addEventListener('submit', e => { if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); } f.classList.add('was-validated'); }); }); })();
+</script>
+{% endblock %}

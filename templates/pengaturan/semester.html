@@ -1,0 +1,80 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Manajemen Semester — KasKu{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+  
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-800 text-white mb-0">Manajemen <span class="gradient-text">Semester</span></h2>
+      <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola data semester, tahun akademik, nominal kas, dan daftar bulan pembayaran.</p>
+    </div>
+    
+    <a href="{{ url_for('semester.tambah') }}" class="btn-primary-custom">
+      <i class="bi bi-calendar-plus"></i> Tambah Semester
+    </a>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-custom align-middle">
+      <thead>
+        <tr>
+          <th>Nama Semester</th>
+          <th>Tahun Akademik</th>
+          <th>Nominal Kas / Bulan</th>
+          <th>Cicilan / Minggu</th>
+          <th>Jumlah Minggu</th>
+          <th>Daftar Bulan</th>
+          <th>Status</th>
+          <th class="text-center" style="width: 150px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if semesters %}
+          {% for sem in semesters %}
+            <tr>
+              <td class="fw-700 text-white">{{ sem.nama_semester }}</td>
+              <td>{{ sem.tahun_akademik }}</td>
+              <td class="text-emerald fw-600">Rp {{ "{:,.0f}".format(sem.nominal_per_bulan).replace(",", ".") }}</td>
+              <td class="text-emerald">Rp {{ "{:,.0f}".format(sem.nominal_per_minggu).replace(",", ".") }}</td>
+              <td>{{ sem.jumlah_minggu }} Minggu</td>
+              <td>
+                {% for b in sem.bulan %}
+                  <span class="badge bg-indigo text-indigo" style="font-size: 0.72rem; padding: 0.25rem 0.5rem; margin-bottom: 2px;">{{ b.nama_bulan }}</span>
+                {% endfor %}
+              </td>
+              <td>
+                {% if sem.status_aktif %}
+                  <span class="badge bg-emerald text-emerald" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Aktif</span>
+                {% else %}
+                  <span class="badge bg-rose text-rose" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">Nonaktif</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{{ url_for('semester.edit', id=sem.id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form action="{{ url_for('semester.hapus', id=sem.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semester {{ sem.nama_semester }}? Tindakan ini juga akan menghapus daftar bulan terkait.')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">Belum ada data semester. Silakan klik tombol "Tambah Semester" di atas.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
