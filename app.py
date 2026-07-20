@@ -5,6 +5,13 @@ from config import Config
 
 def create_app():
     app = Flask(__name__)
+
+    print("=== DEBUG VERCEL ===")
+    print("Template folder:", app.template_folder)
+    print("Current working directory:", os.getcwd())
+    print("Template exists:", os.path.exists("templates/public/home.html"))
+    print("====================")
+
     app.config.from_object(Config)
     Config.init_app(app)
 
