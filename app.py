@@ -6,6 +6,9 @@ from config import Config
 def create_app():
     app = Flask(__name__)
 
+    print("Template folder =", app.template_folder)
+    print("Jinja search path =", app.jinja_loader.searchpath)
+
     # ===== DEBUG =====
     print("========== DEBUG ==========")
     print("BASE_DIR =", os.path.dirname(os.path.abspath(__file__)))
