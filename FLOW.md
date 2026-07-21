@@ -5,7 +5,6 @@ Dokumen ini menjelaskan alur kerja (workflow) pengguna, alur data, serta logika 
 ---
 
 ## 1. Flow Utama & Autentikasi Pengguna
-
 ### A. Alur Pengunjung Umum (Public Guest Flow)
 Pengunjung umum dapat mengakses landing page, Informasi Kas (termasuk mengirim pesan ke bendahara), serta Tentang & FAQ tanpa perlu login.
 
