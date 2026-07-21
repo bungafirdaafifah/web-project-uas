@@ -44,8 +44,8 @@ KasKu adalah sistem informasi berbasis web untuk mengelola, mencatat, dan menyaj
 
 * **Bahasa Pemrograman**: Python 3.x
 * **Web Framework**: Flask (struktur Blueprint)
-* **Database**: SQLite (Relasional)
-* **ORM**: Flask-SQLAlchemy
+* **Database**: Supabase (PostgreSQL) — fallback SQLite untuk jalan lokal tanpa konfigurasi
+* **ORM**: Flask-SQLAlchemy (driver `psycopg2` untuk Postgres)
 * **Autentikasi**: Flask Session + Password hashing (`werkzeug.security`)
 * **Frontend**: HTML5, CSS3 (Custom Vanilla CSS), JavaScript (Vanilla ES6), Bootstrap 5, Bootstrap Icons, Chart.js
 
@@ -70,7 +70,8 @@ Web_Project_UAS/
 ├── TASK.md                    # Checklist pengerjaan proyek
 ├── FLOW.md                    # Alur kerja & logika bisnis aplikasi
 ├── .gitignore                 # File yang diabaikan Git
-├── kas_management.db          # Database SQLite (terbuat otomatis saat pertama run)
+├── .env.example               # Contoh environment variables (SECRET_KEY, DATABASE_URL Supabase)
+├── kas_management.db          # Fallback DB SQLite lokal (dipakai hanya bila DATABASE_URL tidak diset)
 │
 ├── templates/
 │   ├── base.html               # Template utama (navbar, footer, flash message)
@@ -171,21 +172,37 @@ Setelah venv aktif, Anda dapat menginstal dependensi dengan dua cara:
 
 * **Cara A (Menggunakan pip install langsung)**:
   ```bash
-  pip install Flask Flask-SQLAlchemy Pillow python-dotenv
+  pip install Flask Flask-SQLAlchemy Pillow python-dotenv psycopg2-binary
   ```
 * **Cara B (Menggunakan requirements.txt)**:
   ```bash
   pip install -r requirements.txt
   ```
 
-### 5. Inisialisasi Database & Menjalankan Aplikasi
-Jalankan aplikasi utama Flask. Database SQLite `kas_management.db` akan dibuat secara otomatis jika belum ada, lengkap dengan akun admin bawaan dan konten publik awal (Fitur Unggulan, Tentang, FAQ):
+### 5. Konfigurasi Database Supabase
+Aplikasi memakai **Supabase (PostgreSQL)** sebagai database. Siapkan koneksinya:
+
+1. Buat project di [supabase.com](https://supabase.com).
+2. Buka **Project Settings → Database → Connection string**, pilih tab **Connection pooling** (Transaction mode, port `6543`).
+3. Salin `.env.example` menjadi `.env`, lalu isi `DATABASE_URL` dengan connection string tadi dan `SECRET_KEY` dengan string acak:
+   ```bash
+   cp .env.example .env
+   ```
+   ```env
+   SECRET_KEY=string_acak_panjang
+   DATABASE_URL=postgresql://postgres.<ref>:<PASSWORD>@aws-0-<region>.pooler.supabase.com:6543/postgres
+   ```
+
+> **Catatan:** Skema `postgres://` otomatis dinormalkan ke `postgresql://`. Untuk serverless (Vercel) wajib pakai **pooler port 6543**, bukan direct connection port 5432. Bila `DATABASE_URL` tidak diset, aplikasi jatuh ke SQLite lokal (`kas_management.db`) untuk pengembangan cepat.
+
+### 6. Inisialisasi Tabel & Menjalankan Aplikasi
+Jalankan aplikasi utama Flask. Seluruh tabel akan dibuat otomatis di database Supabase jika belum ada (`db.create_all()`), lengkap dengan akun admin bawaan dan konten publik awal (Fitur Unggulan, Tentang, FAQ):
 ```bash
 python app.py
 ```
 Akses aplikasi melalui browser Anda pada URL: **`http://127.0.0.1:5000/`**
 
-### 6. Akun Administrator Bawaan (Default Seed Admin)
+### 7. Akun Administrator Bawaan (Default Seed Admin)
 Untuk masuk ke dashboard pertama kali, silakan gunakan kredensial berikut:
 * **Username**: `admin`
 * **Password**: `admin123`

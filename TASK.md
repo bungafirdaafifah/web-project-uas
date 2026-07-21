@@ -8,10 +8,11 @@ Dokumen ini berisi daftar dependensi (library), panduan menyiapkan virtual envir
 
 Dependensi berikut tercantum di file `requirements.txt`:
 * **Flask** — Framework utama
-* **Flask-SQLAlchemy** — ORM untuk interaksi database SQLite
+* **Flask-SQLAlchemy** — ORM untuk interaksi database Supabase (PostgreSQL)
+* **psycopg2-binary** — Driver PostgreSQL untuk koneksi ke Supabase
 * **Werkzeug** — Keamanan password hash & upload file (bagian dari Flask)
 * **Pillow** — Untuk pengelolaan/validasi file gambar (logo, dsb.)
-* **python-dotenv** — Untuk mengelola environment variables (opsional tapi disarankan)
+* **python-dotenv** — Memuat environment variables dari file `.env` (`SECRET_KEY`, `DATABASE_URL`)
 
 ---
 
@@ -43,12 +44,19 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### Langkah 4: Inisialisasi Database (Pertama kali running)
-Aplikasi akan secara otomatis membuat database `kas_management.db`, menginisialisasi seluruh tabel, akun admin bawaan, serta konten publik awal (Fitur Unggulan, Tentang, FAQ) saat dijalankan pertama kali:
+### Langkah 4: Konfigurasi Supabase
+Salin `.env.example` menjadi `.env`, lalu isi `DATABASE_URL` dengan connection string **Connection pooling** Supabase (Transaction mode, port `6543`) dan `SECRET_KEY` dengan string acak:
+```bash
+cp .env.example .env
+```
+Tanpa `DATABASE_URL`, aplikasi jatuh ke SQLite lokal untuk pengembangan cepat.
+
+### Langkah 5: Inisialisasi Tabel (Pertama kali running)
+Saat pertama dijalankan, aplikasi otomatis membuat seluruh tabel di database Supabase, akun admin bawaan, serta konten publik awal (Fitur Unggulan, Tentang, FAQ):
 * Username Default: `admin`
 * Password Default: `admin123`
 
-### Langkah 5: Jalankan Aplikasi
+### Langkah 6: Jalankan Aplikasi
 ```bash
 python app.py
 ```

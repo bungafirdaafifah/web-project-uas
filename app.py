@@ -1,7 +1,15 @@
+import logging
 import os
 from flask import Flask, render_template
 from models import db, Admin, FiturUnggulan, KontenTentang, FAQ
 from config import Config
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%H:%M:%S",
+)
+log = logging.getLogger("kasku")
 
 def create_app():
     app = Flask(
@@ -10,34 +18,7 @@ def create_app():
         static_folder=os.path.join(os.path.dirname(__file__), "static"),
     )
 
-    print("Template folder =", app.template_folder)
-    print("Jinja search path =", app.jinja_loader.searchpath)
-
-    # ===== DEBUG =====
-    print("========== DEBUG ==========")
-    print("BASE_DIR =", os.path.dirname(os.path.abspath(__file__)))
-    print("CURRENT =", os.getcwd())
-    print("TEMPLATE FOLDER =", app.template_folder)
-
-    print("ISI ROOT =", os.listdir(os.path.dirname(os.path.abspath(__file__))))
-
-    if os.path.exists("templates"):
-        print("ISI templates =", os.listdir("templates"))
-
-    if os.path.exists("templates/public"):
-        print("ISI templates/public =", os.listdir("templates/public"))
-
-    print("===========================")
-    # ===== END DEBUG =====
-
     app.config.from_object(Config)
-
-    print("=" * 50)
-    print("DATABASE_URL =", os.environ.get("DATABASE_URL"))
-    print("DATABASE =", app.config["SQLALCHEMY_DATABASE_URI"])
-    print("=" * 50)
-
-
     Config.init_app(app)
 
     db.init_app(app)
@@ -71,25 +52,6 @@ def create_app():
     def page_not_found(error):
         return render_template('404.html'), 404
 
-    # Create tables and seed default admin on first run
-    with app.app_context():
-        try:
-            print("=== MEMULAI INISIALISASI DATABASE ===")
-
-            db.create_all()
-            print("✓ db.create_all() berhasil")
-
-            _seed_admin()
-            print("✓ _seed_admin() berhasil")
-
-            _seed_konten_situs()
-            print("✓ _seed_konten_situs() berhasil")
-
-        except Exception:
-            import traceback
-            traceback.print_exc()
-            raise
-
     return app
 
 
@@ -104,7 +66,7 @@ def _seed_admin():
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
-        print('[Seed] Default admin account created: admin / admin123')
+        log.info('Seed admin default dibuat: admin / admin123')
 
 
 def _seed_konten_situs():
@@ -123,13 +85,13 @@ def _seed_konten_situs():
         for i, (icon, teks) in enumerate(default_fitur, start=1):
             db.session.add(FiturUnggulan(icon=icon, teks=teks, urutan=i))
         db.session.commit()
-        print('[Seed] Konten Fitur Unggulan default dibuat.')
+        log.info('Seed konten Fitur Unggulan dibuat.')
 
     if not KontenTentang.query.first():
         konten = KontenTentang(
             deskripsi_tentang=(
                 'KasKu adalah aplikasi manajemen uang kas mahasiswa berbasis web yang dibangun '
-                'menggunakan Python 3, Flask, dan SQLite. Aplikasi ini dirancang untuk menggantikan '
+                'menggunakan Python 3, Flask, dan Supabase (PostgreSQL). Aplikasi ini dirancang untuk menggantikan '
                 'sistem pencatatan kas manual yang rentan terhadap kesalahan dan ketidaktransparanan.'
             ),
             tujuan=(
@@ -144,7 +106,7 @@ def _seed_konten_situs():
         )
         db.session.add(konten)
         db.session.commit()
-        print('[Seed] Konten Tentang default dibuat.')
+        log.info('Seed konten Tentang dibuat.')
 
     if not FAQ.query.first():
         default_faqs = [
@@ -160,12 +122,25 @@ def _seed_konten_situs():
         for i, (q, a) in enumerate(default_faqs, start=1):
             db.session.add(FAQ(pertanyaan=q, jawaban=a, urutan=i))
         db.session.commit()
-        print('[Seed] Konten FAQ default dibuat.')
+        log.info('Seed konten FAQ dibuat.')
+
+def init_database(app):
+    with app.app_context():
+        log.info("Inisialisasi database...")
+        db.create_all()
+        _seed_admin()
+        _seed_konten_situs()
+        log.info("Database siap.")
+
 
 app = create_app()
 
+# Jalankan init sekali. Lewati proses parent reloader dev (WERKZEUG_RUN_MAIN
+# belum di-set) supaya tak jalan 2x; gunicorn/Vercel & child reloader tetap init.
+if not (__name__ == '__main__' and not os.environ.get('WERKZEUG_RUN_MAIN')):
+    init_database(app)
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)
 
 
