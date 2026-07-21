@@ -60,7 +60,7 @@ def home():
         db.session.add(settings)
         db.session.commit()
     fitur_list = FiturUnggulan.query.order_by(FiturUnggulan.urutan.asc()).all()
-    return render_template('public/home.html', settings=settings, fitur_list=fitur_list)
+    return render_template('depan/home.html', settings=settings, fitur_list=fitur_list)
 
 
 @public_bp.route('/informasi-kas')
@@ -137,7 +137,7 @@ def informasi_kas():
         saldo_kas = total_pendapatan - total_pengeluaran
 
     return render_template(
-        'public/informasi_kas.html',
+        'depan/informasi_kas.html',
         active_tab=active_tab,
         semesters=semesters,
         semester_kas=semester_kas,
@@ -187,7 +187,7 @@ def kirim_pesan():
 def tentang():
     konten = KontenTentang.query.first()
     faq_list = FAQ.query.order_by(FAQ.urutan.asc()).all()
-    return render_template('public/tentang.html', konten=konten, faq_list=faq_list)
+    return render_template('depan/tentang.html', konten=konten, faq_list=faq_list)
 
 
 # ═══════════════════════════════════════════════════════════════════════════

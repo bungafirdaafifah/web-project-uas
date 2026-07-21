@@ -24,11 +24,11 @@ def create_app():
     log.info("TEMPLATE_FOLDER = %s", tpl_dir)
     if os.path.isdir(tpl_dir):
         log.info("ISI templates/ = %s", os.listdir(tpl_dir))
-        public_dir = os.path.join(tpl_dir, "public")
-        if os.path.isdir(public_dir):
-            log.info("ISI templates/public/ = %s", os.listdir(public_dir))
+        depan_dir = os.path.join(tpl_dir, "depan")
+        if os.path.isdir(depan_dir):
+            log.info("ISI templates/depan/ = %s", os.listdir(depan_dir))
         else:
-            log.warning("templates/public/ TIDAK ADA! Cek: %s", os.listdir(tpl_dir))
+            log.warning("templates/depan/ TIDAK ADA! Cek: %s", os.listdir(tpl_dir))
     else:
         log.warning("TEMPLATE FOLDER TIDAK ADA: %s", tpl_dir)
     # ===== END DEBUG =====
