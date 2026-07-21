@@ -33,8 +33,10 @@ def create_app():
     app.config.from_object(Config)
 
     print("=" * 50)
+    print("DATABASE_URL =", os.environ.get("DATABASE_URL"))
     print("DATABASE =", app.config["SQLALCHEMY_DATABASE_URI"])
     print("=" * 50)
+
 
     Config.init_app(app)
 
