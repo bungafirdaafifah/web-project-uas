@@ -4,7 +4,11 @@ from models import db, Admin, FiturUnggulan, KontenTentang, FAQ
 from config import Config
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(os.path.dirname(__file__), "templates"),
+        static_folder=os.path.join(os.path.dirname(__file__), "static"),
+    )
 
     print("Template folder =", app.template_folder)
     print("Jinja search path =", app.jinja_loader.searchpath)
