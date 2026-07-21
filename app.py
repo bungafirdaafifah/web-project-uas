@@ -13,10 +13,14 @@ log = logging.getLogger("kasku")
 
 def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    static_dir = os.path.join(base_dir, "public", "static")
+    if not os.path.exists(static_dir):
+        static_dir = os.path.join(base_dir, "static")
+
     app = Flask(
         __name__,
         template_folder=os.path.join(base_dir, "templates"),
-        static_folder=os.path.join(base_dir, "static"),
+        static_folder=static_dir,
     )
 
     # ===== DEBUG SEMENTARA — hapus setelah fix =====
