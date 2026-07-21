@@ -18,6 +18,20 @@ def create_app():
         static_folder=os.path.join(os.path.dirname(__file__), "static"),
     )
 
+    # ===== DEBUG SEMENTARA — hapus setelah fix =====
+    tpl_dir = app.template_folder
+    log.info("TEMPLATE_FOLDER = %s", tpl_dir)
+    if os.path.isdir(tpl_dir):
+        log.info("ISI templates/ = %s", os.listdir(tpl_dir))
+        public_dir = os.path.join(tpl_dir, "public")
+        if os.path.isdir(public_dir):
+            log.info("ISI templates/public/ = %s", os.listdir(public_dir))
+        else:
+            log.warning("templates/public/ TIDAK ADA! Cek: %s", os.listdir(tpl_dir))
+    else:
+        log.warning("TEMPLATE FOLDER TIDAK ADA: %s", tpl_dir)
+    # ===== END DEBUG =====
+
     app.config.from_object(Config)
     Config.init_app(app)
 
