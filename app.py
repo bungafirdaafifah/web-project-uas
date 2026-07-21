@@ -24,6 +24,11 @@ def create_app():
     # ===== END DEBUG =====
 
     app.config.from_object(Config)
+
+    print("=" * 50)
+    print("DATABASE =", app.config["SQLALCHEMY_DATABASE_URI"])
+    print("=" * 50)
+
     Config.init_app(app)
 
     db.init_app(app)
