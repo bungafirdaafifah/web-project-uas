@@ -71,9 +71,22 @@ def create_app():
 
     # Create tables and seed default admin on first run
     with app.app_context():
-        db.create_all()
-        _seed_admin()
-        _seed_konten_situs()
+        try:
+            print("=== MEMULAI INISIALISASI DATABASE ===")
+
+            db.create_all()
+            print("✓ db.create_all() berhasil")
+
+            _seed_admin()
+            print("✓ _seed_admin() berhasil")
+
+            _seed_konten_situs()
+            print("✓ _seed_konten_situs() berhasil")
+
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            raise
 
     return app
 
